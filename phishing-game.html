@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detector - HackShield Academy</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-cyan-400">🛡️ HackShield Academy</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">🏠 Home</a>
+                    <a href="leaderboard.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">🏆 Leaderboard</a>
+                    <div class="bg-gray-700 text-yellow-400 px-3 py-2 rounded-md text-sm font-medium">
+                        💰 Score: <span id="totalScore">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Game Content -->
+    <div class="game-container py-8">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold mb-4 text-cyan-400">🎣 Phishing Email Detector</h2>
+            <p class="text-xl text-gray-300">Click on suspicious elements in the email below to identify phishing attempts!</p>
+            <div class="mt-4">
+                <div class="bg-gray-800 inline-block px-6 py-3 rounded-lg">
+                    <span class="text-yellow-400 font-bold">Game Score: </span>
+                    <span id="gameScore" class="text-cyan-400 font-bold">0</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Email Container -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="bg-gray-100 px-6 py-4 border-b">
+                <h3 class="text-lg font-semibold text-gray-800">Email Client</h3>
+            </div>
+            
+            <div class="email-content" id="emailContent">
+                <div class="border-b pb-4 mb-4">
+                    <div class="flex justify-between items-start mb-2">
+                        <div>
+                            <span class="font-semibold text-gray-700">From:</span>
+                            <span class="suspicious-element" data-suspicious="true" data-reason="Suspicious sender domain">
+                                security@amazom.com
+                            </span>
+                        </div>
+                        <div class="text-sm text-gray-500">
+                            Today, 2:47 PM
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <span class="font-semibold text-gray-700">To:</span>
+                        <span>you@email.com</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="font-semibold text-gray-700">Subject:</span>
+                        <span class="suspicious-element" data-suspicious="true" data-reason="Urgent/threatening language">
+                            URGENT: Your Account Will Be Suspended!
+                        </span>
+                    </div>
+                </div>
+
+                <div class="email-body">
+                    <p class="mb-4">Dear Valued Customer,</p>
+                    
+                    <p class="mb-4">
+                        We have detected 
+                        <span class="suspicious-element" data-suspicious="true" data-reason="Vague threat without specifics">
+                            suspicious activity
+                        </span>
+                        on your account. Your account will be suspended within 24 hours unless you verify your information immediately.
+                    </p>
+                    
+                    <p class="mb-4">
+                        Please click 
+                        <a href="#" class="text-blue-600 underline suspicious-element" data-suspicious="true" data-reason="Suspicious URL - doesn't match legitimate Amazon domain">
+                            here
+                        </a>
+                        to verify your account and prevent suspension.
+                    </p>
+                    
+                    <p class="mb-4">
+                        If you do not 
+                        <span class="suspicious-element" data-suspicious="true" data-reason="Poor grammar/spelling">
+                            respont
+                        </span>
+                        within 24 hours, your account will be permanently disabled.
+                    </p>
+                    
+                    <p class="mb-4">
+                        We 
+                        <span class="suspicious-element" data-suspicious="true" data-reason="Poor grammar">
+                            appologize
+                        </span>
+                        for any inconvenience this may cause.
+                    </p>
+                    
+                    <p class="mb-4">
+                        Best regards,<br>
+                        <span class="suspicious-element" data-suspicious="true" data-reason="Generic signature">
+                            The Security Team
+                        </span>
+                    </p>
+                    
+                    <div class="mt-6 p-4 bg-red-50 border border-red-200 rounded">
+                        <p class="text-sm text-red-800">
+                            <strong>Warning:</strong> Please provide your 
+                            <span class="suspicious-element" data-suspicious="true" data-reason="Requesting sensitive information">
+                                password and credit card details
+                            </span>
+                            to verify your identity.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Controls -->
+        <div class="text-center mt-8">
+            <button id="resetGame" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg mr-4">
+                Reset Game
+            </button>
+            <button id="showResults" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg">
+                Show Results
+            </button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="mt-8">
+            <div class="bg-gray-700 rounded-full h-4">
+                <div id="progressBar" class="bg-gradient-to-r from-cyan-500 to-purple-500 h-4 rounded-full transition-all duration-500" style="width: 0%"></div>
+            </div>
+            <p class="text-center mt-2 text-gray-400">
+                Found: <span id="foundCount">0</span> / <span id="totalCount">8</span> suspicious elements
+            </p>
+        </div>
+
+        <!-- Instructions -->
+        <div class="mt-8 bg-gray-800 rounded-lg p-6">
+            <h3 class="text-xl font-bold mb-4 text-cyan-400">How to Play:</h3>
+            <ul class="text-gray-300 space-y-2">
+                <li>• Click on any text that looks suspicious or unusual</li>
+                <li>• Look for spelling errors, strange URLs, and threatening language</li>
+                <li>• Check the sender's email address carefully</li>
+                <li>• Be suspicious of urgent requests for personal information</li>
+                <li>• Each correct identification earns you points!</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Phishing Game Logic
+        let gameScore = 0;
+        let foundSuspicious = 0;
+        let totalSuspicious = 0;
+        let clickedElements = new Set();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get difficulty from URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const difficulty = urlParams.get('difficulty') || 'medium';
+            
+            // Store difficulty for game logic
+            currentDifficulty = difficulty;
+            
+            // Update UI based on difficulty
+            updateGameForDifficulty(difficulty);
+            
+            initializePhishingGame();
+        });
+
+        let currentDifficulty = 'medium';
+
+        function updateGameForDifficulty(difficulty) {
+            const difficultyIndicator = document.createElement('div');
+            difficultyIndicator.className = 'mb-4 text-center';
+            difficultyIndicator.innerHTML = `
+                <div class="inline-block bg-gray-800 rounded-lg px-4 py-2">
+                    <span class="text-gray-300">Difficulty: </span>
+                    <span class="font-bold ${difficulty === 'easy' ? 'text-green-400' : difficulty === 'medium' ? 'text-yellow-400' : 'text-red-400'}">${difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}</span>
+                </div>
+            `;
+            
+            const gameContainer = document.querySelector('.game-container');
+            gameContainer.insertBefore(difficultyIndicator, gameContainer.firstChild);
+            
+            // Adjust game mechanics based on difficulty
+            if (difficulty === 'easy') {
+                // Add more obvious highlighting for suspicious elements
+                document.querySelectorAll('.suspicious-element').forEach(element => {
+                    element.style.backgroundColor = 'rgba(239, 68, 68, 0.1)';
+                    element.style.border = '1px dashed rgba(239, 68, 68, 0.3)';
+                });
+            } else if (difficulty === 'hard') {
+                // Remove some visual cues
+                document.querySelectorAll('.suspicious-element').forEach(element => {
+                    element.style.backgroundColor = 'transparent';
+                    element.style.border = 'none';
+                });
+            }
+        }
+
+        function initializePhishingGame() {
+            // Update score display
+            if (window.HackShield) {
+                window.HackShield.updateScoreDisplay();
+            }
+            
+            // Count total suspicious elements
+            totalSuspicious = document.querySelectorAll('.suspicious-element').length;
+            document.getElementById('totalCount').textContent = totalSuspicious;
+            
+            // Add click listeners to suspicious elements
+            document.querySelectorAll('.suspicious-element').forEach(element => {
+                element.addEventListener('click', handleSuspiciousClick);
+            });
+            
+            // Add click listeners to non-suspicious elements
+            document.querySelectorAll('.email-content').forEach(element => {
+                element.addEventListener('click', handleNormalClick);
+            });
+            
+            // Game control buttons
+            document.getElementById('resetGame').addEventListener('click', resetGame);
+            document.getElementById('showResults').addEventListener('click', showResults);
+        }
+
+        function handleSuspiciousClick(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const element = event.target;
+            const elementId = element.textContent.trim();
+            
+            if (clickedElements.has(elementId)) {
+                return; // Already clicked
+            }
+            
+            clickedElements.add(elementId);
+            
+            if (element.dataset.suspicious === 'true') {
+                // Correct identification
+                element.classList.add('clicked-correct');
+                foundSuspicious++;
+                gameScore += 10;
+                
+                if (window.HackShield) {
+                    window.HackShield.playSound('correct');
+                }
+                
+                // Show reason
+                showFeedbackTooltip(element, element.dataset.reason, true);
+                
+                updateGameDisplay();
+                
+                // Check if game is complete
+                if (foundSuspicious === totalSuspicious) {
+                    setTimeout(() => {
+                        completeGame();
+                    }, 1000);
+                }
+            }
+        }
+
+        function handleNormalClick(event) {
+            // Check if clicked on a non-suspicious element
+            if (!event.target.classList.contains('suspicious-element')) {
+                const clickedText = event.target.textContent.trim();
+                
+                if (clickedText.length > 3 && !clickedElements.has(clickedText)) {
+                    clickedElements.add(clickedText);
+                    
+                    // Wrong identification
+                    gameScore = Math.max(0, gameScore - 2);
+                    
+                    if (window.HackShield) {
+                        window.HackShield.playSound('incorrect');
+                    }
+                    
+                    showFeedbackTooltip(event.target, 'This element is not suspicious', false);
+                    updateGameDisplay();
+                }
+            }
+        }
+
+        function showFeedbackTooltip(element, message, isCorrect) {
+            const tooltip = document.createElement('div');
+            tooltip.className = `absolute z-50 px-3 py-2 rounded-lg text-sm font-medium shadow-lg ${
+                isCorrect ? 'bg-green-500' : 'bg-red-500'
+            } text-white`;
+            tooltip.textContent = message;
+            
+            const rect = element.getBoundingClientRect();
+            tooltip.style.left = rect.left + 'px';
+            tooltip.style.top = (rect.top - 40) + 'px';
+            tooltip.style.position = 'fixed';
+            
+            document.body.appendChild(tooltip);
+            
+            setTimeout(() => {
+                tooltip.remove();
+            }, 3000);
+        }
+
+        function updateGameDisplay() {
+            document.getElementById('gameScore').textContent = gameScore;
+            document.getElementById('foundCount').textContent = foundSuspicious;
+            
+            const progress = (foundSuspicious / totalSuspicious) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+        }
+
+        function resetGame() {
+            gameScore = 0;
+            foundSuspicious = 0;
+            clickedElements.clear();
+            
+            // Reset visual states
+            document.querySelectorAll('.suspicious-element').forEach(element => {
+                element.classList.remove('clicked-correct', 'clicked-incorrect');
+            });
+            
+            // Remove any existing tooltips
+            document.querySelectorAll('.feedback-correct, .feedback-incorrect').forEach(tooltip => {
+                tooltip.remove();
+            });
+            
+            updateGameDisplay();
+        }
+
+        function showResults() {
+            const accuracy = totalSuspicious > 0 ? (foundSuspicious / totalSuspicious) * 100 : 0;
+            let message = `Game Results:\n\n`;
+            message += `Suspicious elements found: ${foundSuspicious}/${totalSuspicious}\n`;
+            message += `Accuracy: ${accuracy.toFixed(1)}%\n`;
+            message += `Score: ${gameScore} points\n\n`;
+            
+            if (accuracy === 100) {
+                message += `🎉 Perfect! You identified all phishing attempts!`;
+            } else if (accuracy >= 75) {
+                message += `👍 Great job! You're getting good at spotting phishing emails.`;
+            } else if (accuracy >= 50) {
+                message += `🔍 Not bad! Keep practicing to improve your detection skills.`;
+            } else {
+                message += `📚 Keep learning! Phishing detection takes practice.`;
+            }
+            
+            alert(message);
+        }
+
+        function completeGame() {
+            const finalScore = gameScore + (foundSuspicious === totalSuspicious ? 20 : 0); // Bonus for finding all
+            
+            if (window.HackShield) {
+                window.HackShield.updateScore('phishing', finalScore);
+                window.HackShield.playSound('achievement');
+            }
+            
+            // Update leaderboard
+            if (window.HackShield && window.HackShield.updateGameLeaderboard) {
+                window.HackShield.updateGameLeaderboard('phishing', finalScore);
+            }
+            
+            // Show completion message
+            const completionDiv = document.createElement('div');
+            completionDiv.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            completionDiv.innerHTML = `
+                <div class="bg-gray-800 rounded-lg p-8 max-w-md mx-4 text-center">
+                    <div class="text-6xl mb-4">🎉</div>
+                    <h3 class="text-2xl font-bold mb-4 text-cyan-400">Game Complete!</h3>
+                    <p class="text-gray-300 mb-4">You identified all ${totalSuspicious} suspicious elements!</p>
+                    <p class="text-yellow-400 text-xl font-bold mb-6">+${finalScore} points earned!</p>
+                    <div class="space-y-3">
+                        <button onclick="this.parentElement.parentElement.parentElement.remove(); resetGame();" 
+                                class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">
+                            Play Again
+                        </button>
+                        <button onclick="window.location.href='leaderboard.html'" 
+                                class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded">
+                            View Leaderboard
+                        </button>
+                        <button onclick="window.location.href='index.html'" 
+                                class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            Back to Home
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(completionDiv);
+        }
+    </script>
+</body>
+</html>

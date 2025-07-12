@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - HackShield Academy</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white min-h-screen flex items-center justify-center">
+    <div class="bg-gray-800 rounded-lg shadow-2xl p-8 w-full max-w-md">
+        <div class="text-center mb-8">
+            <h1 class="text-4xl font-bold text-cyan-400 mb-2">🛡️ HackShield Academy</h1>
+            <p class="text-gray-300">Secure Your Cyber Future</p>
+        </div>
+
+        <!-- Login/Register Toggle -->
+        <div class="flex mb-6">
+            <button id="loginTab" class="flex-1 py-2 px-4 bg-cyan-600 text-white rounded-l-lg font-medium">
+                Login
+            </button>
+            <button id="registerTab" class="flex-1 py-2 px-4 bg-gray-600 text-gray-300 rounded-r-lg font-medium">
+                Register
+            </button>
+        </div>
+
+        <!-- Login Form -->
+        <form id="loginForm" class="space-y-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                <input type="text" id="loginUsername" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Enter your username" required>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <input type="password" id="loginPassword" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Enter your password" required>
+            </div>
+            <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                Login
+            </button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="space-y-6 hidden">
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Username</label>
+                <input type="text" id="registerUsername" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Choose a username" required>
+                <div id="usernameError" class="text-red-400 text-sm mt-1 hidden">Username already exists</div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                <input type="password" id="registerPassword" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Choose a password" required>
+                <div class="text-xs text-gray-400 mt-1">Password must be at least 6 characters</div>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-gray-300 mb-2">Confirm Password</label>
+                <input type="password" id="confirmPassword" class="w-full px-3 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-cyan-500" placeholder="Confirm your password" required>
+                <div id="passwordError" class="text-red-400 text-sm mt-1 hidden">Passwords don't match</div>
+            </div>
+            <button type="submit" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                Register
+            </button>
+        </form>
+
+        <!-- Demo Login -->
+        <div class="mt-6 pt-6 border-t border-gray-600">
+            <p class="text-center text-sm text-gray-400 mb-3">Quick Demo</p>
+            <button id="demoLogin" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                Continue as Guest
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Login System Logic
+        class AuthSystem {
+            constructor() {
+                this.users = JSON.parse(localStorage.getItem('hackshield_users') || '{}');
+                this.currentUser = localStorage.getItem('hackshield_current_user');
+                this.init();
+            }
+
+            init() {
+                // Check if user is already logged in
+                if (this.currentUser && this.users[this.currentUser]) {
+                    this.redirectToHome();
+                    return;
+                }
+
+                // Set up event listeners
+                document.getElementById('loginTab').addEventListener('click', () => this.showLogin());
+                document.getElementById('registerTab').addEventListener('click', () => this.showRegister());
+                document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
+                document.getElementById('registerForm').addEventListener('submit', (e) => this.handleRegister(e));
+                document.getElementById('demoLogin').addEventListener('click', () => this.handleDemo());
+
+                // Real-time validation
+                document.getElementById('registerUsername').addEventListener('input', (e) => this.validateUsername(e));
+                document.getElementById('confirmPassword').addEventListener('input', (e) => this.validatePassword(e));
+            }
+
+            showLogin() {
+                document.getElementById('loginTab').classList.add('bg-cyan-600', 'text-white');
+                document.getElementById('loginTab').classList.remove('bg-gray-600', 'text-gray-300');
+                document.getElementById('registerTab').classList.add('bg-gray-600', 'text-gray-300');
+                document.getElementById('registerTab').classList.remove('bg-cyan-600', 'text-white');
+                
+                document.getElementById('loginForm').classList.remove('hidden');
+                document.getElementById('registerForm').classList.add('hidden');
+            }
+
+            showRegister() {
+                document.getElementById('registerTab').classList.add('bg-cyan-600', 'text-white');
+                document.getElementById('registerTab').classList.remove('bg-gray-600', 'text-gray-300');
+                document.getElementById('loginTab').classList.add('bg-gray-600', 'text-gray-300');
+                document.getElementById('loginTab').classList.remove('bg-cyan-600', 'text-white');
+                
+                document.getElementById('registerForm').classList.remove('hidden');
+                document.getElementById('loginForm').classList.add('hidden');
+            }
+
+            validateUsername(e) {
+                const username = e.target.value.trim();
+                const errorDiv = document.getElementById('usernameError');
+                
+                if (username && this.users[username]) {
+                    errorDiv.classList.remove('hidden');
+                    return false;
+                } else {
+                    errorDiv.classList.add('hidden');
+                    return true;
+                }
+            }
+
+            validatePassword(e) {
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = e.target.value;
+                const errorDiv = document.getElementById('passwordError');
+                
+                if (confirmPassword && password !== confirmPassword) {
+                    errorDiv.classList.remove('hidden');
+                    return false;
+                } else {
+                    errorDiv.classList.add('hidden');
+                    return true;
+                }
+            }
+
+            handleLogin(e) {
+                e.preventDefault();
+                const username = document.getElementById('loginUsername').value.trim();
+                const password = document.getElementById('loginPassword').value;
+
+                if (!username || !password) {
+                    this.showError('Please fill in all fields');
+                    return;
+                }
+
+                const user = this.users[username];
+                if (!user || user.password !== password) {
+                    this.showError('Invalid username or password');
+                    return;
+                }
+
+                this.loginUser(username);
+            }
+
+            handleRegister(e) {
+                e.preventDefault();
+                const username = document.getElementById('registerUsername').value.trim();
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                if (!username || !password || !confirmPassword) {
+                    this.showError('Please fill in all fields');
+                    return;
+                }
+
+                if (password.length < 6) {
+                    this.showError('Password must be at least 6 characters');
+                    return;
+                }
+
+                if (password !== confirmPassword) {
+                    this.showError('Passwords don\'t match');
+                    return;
+                }
+
+                if (this.users[username]) {
+                    this.showError('Username already exists');
+                    return;
+                }
+
+                // Create new user
+                this.users[username] = {
+                    password: password,
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString()
+                };
+
+                localStorage.setItem('hackshield_users', JSON.stringify(this.users));
+                this.loginUser(username);
+                this.showSuccess('Account created successfully!');
+            }
+
+            handleDemo() {
+                const demoUsername = 'Guest_' + Date.now();
+                this.users[demoUsername] = {
+                    password: 'demo',
+                    createdAt: new Date().toISOString(),
+                    lastLogin: new Date().toISOString(),
+                    isGuest: true
+                };
+                localStorage.setItem('hackshield_users', JSON.stringify(this.users));
+                this.loginUser(demoUsername);
+            }
+
+            loginUser(username) {
+                // Update last login
+                this.users[username].lastLogin = new Date().toISOString();
+                localStorage.setItem('hackshield_users', JSON.stringify(this.users));
+                
+                // Set current user
+                localStorage.setItem('hackshield_current_user', username);
+                localStorage.setItem('hackshield_username', username);
+                
+                // Initialize user scores if they don't exist
+                if (!localStorage.getItem('hackshield_phishing_score')) {
+                    localStorage.setItem('hackshield_phishing_score', '0');
+                    localStorage.setItem('hackshield_password_score', '0');
+                    localStorage.setItem('hackshield_scam_score', '0');
+                    localStorage.setItem('hackshield_quiz_score', '0');
+                }
+                
+                this.redirectToHome();
+            }
+
+            redirectToHome() {
+                window.location.href = 'index.html';
+            }
+
+            showError(message) {
+                this.showNotification(message, 'error');
+            }
+
+            showSuccess(message) {
+                this.showNotification(message, 'success');
+            }
+
+            showNotification(message, type) {
+                const notification = document.createElement('div');
+                notification.className = `fixed top-4 right-4 px-6 py-4 rounded-lg shadow-lg z-50 text-white ${
+                    type === 'error' ? 'bg-red-500' : 'bg-green-500'
+                }`;
+                notification.textContent = message;
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    notification.remove();
+                }, 3000);
+            }
+        }
+
+        // Initialize the auth system
+        new AuthSystem();
+    </script>
+</body>
+</html>

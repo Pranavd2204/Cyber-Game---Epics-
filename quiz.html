@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Zone - HackShield Academy</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-900 text-white">
+    <!-- Navigation -->
+    <nav class="bg-gray-800 shadow-lg sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0">
+                        <h1 class="text-2xl font-bold text-cyan-400">🛡️ HackShield Academy</h1>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="index.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">🏠 Home</a>
+                    <a href="leaderboard.html" class="text-gray-300 hover:text-white px-3 py-2 rounded-md text-sm font-medium transition-colors">🏆 Leaderboard</a>
+                    <div class="bg-gray-700 text-yellow-400 px-3 py-2 rounded-md text-sm font-medium">
+                        💰 Score: <span id="totalScore">0</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Game Content -->
+    <div class="game-container py-8">
+        <div class="text-center mb-8">
+            <h2 class="text-4xl font-bold mb-4 text-cyan-400">📚 Cybersecurity Quiz Zone</h2>
+            <p class="text-xl text-gray-300">Test your knowledge and become a cybersecurity expert!</p>
+            <div class="mt-4 flex justify-center space-x-4">
+                <div class="bg-gray-800 px-6 py-3 rounded-lg">
+                    <span class="text-yellow-400 font-bold">Quiz Score: </span>
+                    <span id="quizScore" class="text-cyan-400 font-bold">0</span>
+                </div>
+                <div class="bg-gray-800 px-6 py-3 rounded-lg">
+                    <span class="text-green-400 font-bold">Question: </span>
+                    <span id="questionNumber" class="text-white font-bold">1</span>
+                    <span class="text-gray-300"> / 10</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Container -->
+        <div class="max-w-2xl mx-auto">
+            <!-- Question Display -->
+            <div class="quiz-question" id="questionContainer">
+                <div class="text-center mb-6">
+                    <div class="text-6xl mb-4" id="questionIcon">🤔</div>
+                    <h3 class="text-2xl font-bold mb-4 text-cyan-400" id="questionTitle">Question 1</h3>
+                    <p class="text-lg text-gray-300" id="questionText">Loading question...</p>
+                </div>
+                
+                <div class="space-y-3" id="answerOptions">
+                    <!-- Answer options will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="mt-6">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-gray-300">Progress</span>
+                    <span class="text-sm font-medium text-cyan-400" id="progressText">0%</span>
+                </div>
+                <div class="w-full bg-gray-700 rounded-full h-3">
+                    <div id="progressBar" class="bg-gradient-to-r from-cyan-500 to-purple-500 h-3 rounded-full transition-all duration-500" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <!-- Quiz Stats -->
+            <div class="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-green-400" id="correctAnswers">0</div>
+                    <div class="text-sm text-gray-300">Correct</div>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-red-400" id="incorrectAnswers">0</div>
+                    <div class="text-sm text-gray-300">Incorrect</div>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-yellow-400" id="currentStreak">0</div>
+                    <div class="text-sm text-gray-300">Streak</div>
+                </div>
+                <div class="bg-gray-800 rounded-lg p-4 text-center">
+                    <div class="text-2xl font-bold text-purple-400" id="bestStreak">0</div>
+                    <div class="text-sm text-gray-300">Best Streak</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Instructions -->
+        <div class="mt-8 bg-gray-800 rounded-lg p-6 max-w-2xl mx-auto">
+            <h3 class="text-xl font-bold mb-4 text-cyan-400">Quiz Instructions:</h3>
+            <ul class="text-gray-300 space-y-2">
+                <li>• Answer all 10 questions to complete the quiz</li>
+                <li>• Each correct answer earns you points</li>
+                <li>• Bonus points for answer streaks!</li>
+                <li>• Take your time - there's no time limit</li>
+                <li>• Learn from the explanations provided</li>
+            </ul>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        // Quiz Game Logic
+        let currentQuestion = 0;
+        let quizScore = 0;
+        let correctAnswers = 0;
+        let incorrectAnswers = 0;
+        let currentStreak = 0;
+        let bestStreak = 0;
+        let userAnswers = [];
+
+        // Quiz questions database
+        const questions = [
+            {
+                icon: "🔐",
+                question: "What makes a password strong?",
+                options: [
+                    "Using your birthday",
+                    "At least 12 characters with mixed case, numbers, and symbols",
+                    "Using the same password everywhere",
+                    "Using common words like 'password123'"
+                ],
+                correct: 1,
+                explanation: "Strong passwords should be at least 12 characters long and include a mix of uppercase, lowercase, numbers, and special characters."
+            },
+            {
+                icon: "🎣",
+                question: "What is phishing?",
+                options: [
+                    "A type of computer virus",
+                    "A way to catch fish online",
+                    "Fraudulent attempts to obtain sensitive information",
+                    "A method to speed up internet connection"
+                ],
+                correct: 2,
+                explanation: "Phishing is a social engineering attack where criminals impersonate legitimate entities to steal sensitive information like passwords or credit card numbers."
+            },
+            {
+                icon: "🛡️",
+                question: "What should you do if you receive a suspicious email?",
+                options: [
+                    "Click all links to investigate",
+                    "Forward it to all your contacts",
+                    "Delete it and report it to IT",
+                    "Reply asking for more information"
+                ],
+                correct: 2,
+                explanation: "Never click suspicious links or download attachments. Delete the email and report it to your IT department or email provider."
+            },
+            {
+                icon: "🔒",
+                question: "What does HTTPS stand for?",
+                options: [
+                    "HyperText Transfer Protocol Secure",
+                    "High Tech Transfer Protocol System",
+                    "HyperText Technical Protocol Security",
+                    "High Transfer Text Protocol Secure"
+                ],
+                correct: 0,
+                explanation: "HTTPS (HyperText Transfer Protocol Secure) encrypts data between your browser and the website, protecting your information from eavesdroppers."
+            },
+            {
+                icon: "📱",
+                question: "What is two-factor authentication (2FA)?",
+                options: [
+                    "Using two different passwords",
+                    "Logging in twice to the same account",
+                    "An extra layer of security requiring a second form of verification",
+                    "A type of antivirus software"
+                ],
+                correct: 2,
+                explanation: "2FA adds an extra layer of security by requiring something you know (password) and something you have (like a phone) to access your account."
+            },
+            {
+                icon: "🔥",
+                question: "What is a firewall?",
+                options: [
+                    "A wall that prevents fires",
+                    "A security system that monitors network traffic",
+                    "A type of computer virus",
+                    "A password manager"
+                ],
+                correct: 1,
+                explanation: "A firewall is a security system that monitors and controls incoming and outgoing network traffic based on predetermined security rules."
+            },
+            {
+                icon: "💳",
+                question: "When shopping online, what should you look for to ensure the site is secure?",
+                options: [
+                    "The website looks professional",
+                    "HTTPS in the URL and a lock icon",
+                    "The site has many pop-up ads",
+                    "The prices are very cheap"
+                ],
+                correct: 1,
+                explanation: "Always look for HTTPS in the URL and a lock icon in the address bar. This indicates the website encrypts your data during transmission."
+            },
+            {
+                icon: "📧",
+                question: "What is social engineering?",
+                options: [
+                    "Building social networks",
+                    "Manipulating people to divulge confidential information",
+                    "Engineering social media platforms",
+                    "A type of software engineering"
+                ],
+                correct: 1,
+                explanation: "Social engineering is the psychological manipulation of people to perform actions or divulge confidential information."
+            },
+            {
+                icon: "🦠",
+                question: "What is malware?",
+                options: [
+                    "A type of hardware",
+                    "Software designed to help computers run faster",
+                    "Malicious software designed to damage or gain unauthorized access",
+                    "A programming language"
+                ],
+                correct: 2,
+                explanation: "Malware is malicious software specifically designed to disrupt, damage, or gain unauthorized access to computer systems."
+            },
+            {
+                icon: "🔄",
+                question: "How often should you update your software?",
+                options: [
+                    "Only when it breaks",
+                    "Once a year",
+                    "As soon as updates are available",
+                    "Never, updates cause problems"
+                ],
+                correct: 2,
+                explanation: "Software updates often include security patches that fix vulnerabilities. Install updates as soon as they're available to stay protected."
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeQuiz();
+        });
+
+        function initializeQuiz() {
+            // Update score display
+            if (window.HackShield) {
+                window.HackShield.updateScoreDisplay();
+            }
+            
+            // Shuffle questions for variety
+            shuffleArray(questions);
+            
+            // Start the quiz
+            displayQuestion();
+        }
+
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        function displayQuestion() {
+            const question = questions[currentQuestion];
+            
+            // Update question display
+            document.getElementById('questionIcon').textContent = question.icon;
+            document.getElementById('questionTitle').textContent = `Question ${currentQuestion + 1}`;
+            document.getElementById('questionText').textContent = question.question;
+            document.getElementById('questionNumber').textContent = currentQuestion + 1;
+            
+            // Clear previous options and feedback
+            const optionsContainer = document.getElementById('answerOptions');
+            optionsContainer.innerHTML = '';
+            
+            // Remove any existing feedback
+            const existingFeedback = document.querySelector('.quiz-feedback');
+            if (existingFeedback) {
+                existingFeedback.remove();
+            }
+            
+            // Remove any existing next button
+            const existingNextBtn = document.querySelector('.quiz-next-btn');
+            if (existingNextBtn) {
+                existingNextBtn.remove();
+            }
+            
+            // Display answer options
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'quiz-option';
+                button.textContent = `${String.fromCharCode(65 + index)}. ${option}`;
+                button.onclick = () => selectAnswer(index);
+                optionsContainer.appendChild(button);
+            });
+            
+            // Update progress
+            updateProgress();
+        }
+
+        function selectAnswer(selectedIndex) {
+            const question = questions[currentQuestion];
+            const isCorrect = selectedIndex === question.correct;
+            
+            // Disable all options
+            const options = document.querySelectorAll('.quiz-option');
+            options.forEach((option, index) => {
+                option.disabled = true;
+                option.onclick = null;
+                
+                if (index === question.correct) {
+                    option.classList.add('correct');
+                } else if (index === selectedIndex && !isCorrect) {
+                    option.classList.add('incorrect');
+                }
+            });
+            
+            // Update stats
+            if (isCorrect) {
+                correctAnswers++;
+                currentStreak++;
+                bestStreak = Math.max(bestStreak, currentStreak);
+                
+                // Calculate points (base points + streak bonus)
+                const basePoints = 10;
+                const streakBonus = Math.min(currentStreak - 1, 5) * 2; // Max 10 bonus points
+                const points = basePoints + streakBonus;
+                
+                quizScore += points;
+                
+                if (window.HackShield) {
+                    window.HackShield.playSound('correct');
+                }
+                
+                showFeedback(true, `Correct! +${points} points`, question.explanation);
+            } else {
+                incorrectAnswers++;
+                currentStreak = 0;
+                
+                if (window.HackShield) {
+                    window.HackShield.playSound('incorrect');
+                }
+                
+                showFeedback(false, "Incorrect", question.explanation);
+            }
+            
+            // Store user's answer
+            userAnswers.push({
+                question: question.question,
+                selectedIndex: selectedIndex,
+                correct: isCorrect,
+                explanation: question.explanation
+            });
+            
+            // Update displays
+            updateStats();
+            updateProgress();
+            
+            // Show next button after delay
+            setTimeout(() => {
+                showNextButton();
+            }, 3000);
+        }
+
+        function showFeedback(isCorrect, message, explanation) {
+            const feedbackDiv = document.createElement('div');
+            feedbackDiv.className = `quiz-feedback mt-4 p-4 rounded-lg ${isCorrect ? 'bg-green-600' : 'bg-red-600'}`;
+            feedbackDiv.innerHTML = `
+                <div class="font-bold text-white mb-2">${message}</div>
+                <div class="text-sm text-gray-100">${explanation}</div>
+            `;
+            
+            document.getElementById('questionContainer').appendChild(feedbackDiv);
+        }
+
+        function showNextButton() {
+            const nextButton = document.createElement('button');
+            nextButton.className = 'quiz-next-btn w-full mt-4 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-3 px-6 rounded-lg transition-colors';
+            nextButton.innerHTML = currentQuestion < questions.length - 1 ? 
+                '➡️ Next Question' : 
+                '📊 View Results';
+            nextButton.onclick = nextQuestion;
+            
+            document.getElementById('questionContainer').appendChild(nextButton);
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            
+            if (currentQuestion < questions.length) {
+                displayQuestion();
+            } else {
+                endQuiz();
+            }
+        }
+
+        function updateStats() {
+            document.getElementById('quizScore').textContent = quizScore;
+            document.getElementById('correctAnswers').textContent = correctAnswers;
+            document.getElementById('incorrectAnswers').textContent = incorrectAnswers;
+            document.getElementById('currentStreak').textContent = currentStreak;
+            document.getElementById('bestStreak').textContent = bestStreak;
+        }
+
+        function updateProgress() {
+            const progress = ((currentQuestion + 1) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('progressText').textContent = Math.round(progress) + '%';
+        }
+
+        function endQuiz() {
+            const accuracy = (correctAnswers / questions.length) * 100;
+            
+            // Calculate final bonus
+            let bonus = 0;
+            if (accuracy === 100) {
+                bonus = 50; // Perfect score
+            } else if (accuracy >= 90) {
+                bonus = 30; // Excellent
+            } else if (accuracy >= 80) {
+                bonus = 20; // Good
+            } else if (accuracy >= 70) {
+                bonus = 10; // Fair
+            }
+            
+            // Add best streak bonus
+            if (bestStreak >= 5) {
+                bonus += 20;
+            } else if (bestStreak >= 3) {
+                bonus += 10;
+            }
+            
+            quizScore += bonus;
+            
+            // Update localStorage
+            if (window.HackShield) {
+                window.HackShield.updateScore('quiz', quizScore);
+            }
+            
+            // Show results
+            showQuizResults(accuracy, bonus);
+        }
+
+        function showQuizResults(accuracy, bonus) {
+            let grade, message;
+            
+            if (accuracy === 100) {
+                grade = 'A+';
+                message = 'Perfect! You\'re a cybersecurity expert!';
+            } else if (accuracy >= 90) {
+                grade = 'A';
+                message = 'Excellent! You have strong cybersecurity knowledge!';
+            } else if (accuracy >= 80) {
+                grade = 'B';
+                message = 'Good job! You understand cybersecurity basics!';
+            } else if (accuracy >= 70) {
+                grade = 'C';
+                message = 'Not bad! Keep learning to improve your skills!';
+            } else if (accuracy >= 60) {
+                grade = 'D';
+                message = 'You need more practice. Review the basics!';
+            } else {
+                grade = 'F';
+                message = 'Keep studying! Cybersecurity is important!';
+            }
+            
+            const modal = document.createElement('div');
+            modal.className = 'fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50';
+            modal.innerHTML = `
+                <div class="bg-gray-800 rounded-lg p-8 max-w-md mx-4 text-center">
+                    <div class="text-6xl mb-4">🎓</div>
+                    <h3 class="text-2xl font-bold mb-4 text-cyan-400">Quiz Complete!</h3>
+                    <div class="space-y-4">
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="text-sm text-gray-300">Your Grade</div>
+                            <div class="text-4xl font-bold text-yellow-400">${grade}</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="text-sm text-gray-300">Accuracy</div>
+                            <div class="text-2xl font-bold text-green-400">${accuracy.toFixed(1)}%</div>
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="text-sm text-gray-300">Total Points</div>
+                            <div class="text-2xl font-bold text-cyan-400">${quizScore}</div>
+                            ${bonus > 0 ? `<div class="text-sm text-yellow-400">+${bonus} bonus points!</div>` : ''}
+                        </div>
+                        <div class="bg-gray-700 rounded-lg p-4">
+                            <div class="text-sm text-gray-300">Best Streak</div>
+                            <div class="text-2xl font-bold text-purple-400">${bestStreak}</div>
+                        </div>
+                        <p class="text-gray-300 italic">${message}</p>
+                    </div>
+                    <div class="mt-6 space-y-3">
+                        <button onclick="window.location.reload()" 
+                                class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded">
+                            Take Quiz Again
+                        </button>
+                        <button onclick="window.location.href='index.html'" 
+                                class="w-full bg-gray-600 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
+                            Back to Home
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+        }
+    </script>
+</body>
+</html>
