@@ -219,31 +219,5 @@ We welcome contributions to make HackShield Academy even better! Here's how you 
 5. Push to the branch: `git push origin feature/amazing-feature`
 6. Open a Pull Request
 
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
-```
-MIT License - Feel free to use, modify, and distribute!
-```
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=assassinaj602/hackshield-academy&type=Date)](https://star-history.com/#assassinaj602/hackshield-academy&Date)
-
-## 🛡️ Security Education
-
-HackShield Academy is designed to educate users about cybersecurity threats in a safe, interactive environment. All simulated phishing emails, scam scenarios, and security examples are for **educational purposes only** and should not be used maliciously.
-
-## 📞 Support & Feedback
-
-- 🐛 **Found a bug?** [Create an issue](https://github.com/assassinaj602/hackshield-academy/issues)
-- 💡 **Have a suggestion?** [Start a discussion](https://github.com/assassinaj602/hackshield-academy/discussions)
-- ⭐ **Like the project?** Give us a star on GitHub!
-
----
-
-<div align="center">
-
 **🛡️ Stay Safe, Stay Secure! 🛡️**
 
