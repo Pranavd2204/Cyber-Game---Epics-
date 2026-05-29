@@ -1,8 +1,6 @@
-# 🛡️ HackShield Academy
+# 🛡️ CYBER GAME - HackShield Academy
 
 <div align="center">
-
-![HackShield Academy Banner](screenshots/banner.png)
 
 **A comprehensive cybersecurity education platform designed to teach users about various security threats through interactive games and simulations.**
 
@@ -249,8 +247,3 @@ HackShield Academy is designed to educate users about cybersecurity threats in a
 
 **🛡️ Stay Safe, Stay Secure! 🛡️**
 
-Made with ❤️ for cybersecurity education
-
-[⬆ Back to Top](#️-hackshield-academy)
-
-</div>
